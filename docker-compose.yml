@@ -1,0 +1,13 @@
+services:
+  claude:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude
+    working_dir: /workspace
+    volumes:
+      - Path/To/Directory:/workspace
+    tty: true
+    stdin_open: true
+    environment:
+      - SHELL=/bin/bash
