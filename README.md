@@ -15,47 +15,6 @@ It lets you interact with Claude for code generation, editing, and AI-assisted d
 - Automatic installation of `@anthropic-ai/claude-code`
 - Fully interactive shell session
 
-## 🛠️ Setup
-
-### 1. Prepare your project directory
-Navigate to the project you want to use with Claude:
-```bash
-cd Path/To/Directory
-```
-
-### 2. Copy the following files into the project root
-
-#### `Dockerfile`
-
-```dockerfile
-FROM node:24-alpine
-RUN apk add --no-cache bash
-ENV SHELL=/bin/bash NODE_ENV=development
-WORKDIR /workspace
-RUN npm install -g @anthropic-ai/claude-code
-CMD ["/bin/bash"]
-```
-
-#### `docker-compose.yml`
-
-```yaml
-services:
-  claude:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: claude
-    working_dir: /workspace
-    volumes:
-      - Path/To/Directory:/workspace
-    tty: true
-    stdin_open: true
-    environment:
-      - SHELL=/bin/bash
-```
-
----
-
 ## ⚙️ Usage
 
 ### Build the image
@@ -84,8 +43,6 @@ claude
 docker start -ai claude
 ```
 
----
-
 ## 📁 Folder Mapping
 
 Your local project directory:
@@ -102,7 +59,7 @@ is mounted inside the container as
 
 Any file changes in either location are synchronized automatically.
 
----
+--
 
 ## 🧹 Cleanup
 
@@ -112,29 +69,11 @@ Remove container and image:
 docker compose down --rmi all
 ```
 
----
 
 ## 🧠 Notes
 
 * The `$SHELL` environment variable ensures Claude detects a valid POSIX shell.
-* `bash` is minimal but sufficient for all Claude CLI operations.
-* No data is stored outside the mounted volume.
-
----
-
-## 🧩 Commands Summary
-
-| Command                         | Description                     |
-| ------------------------------- | ------------------------------- |
-| `docker compose build`          | Build the Docker image          |
-| `docker compose run claude`     | Start an interactive container  |
-| `claude`                        | Launch the Claude CLI           |
-| `docker start -ai claude`       | Reattach to a stopped container |
-| `docker compose down --rmi all` | Clean up everything             |
-
----
 
 ### ✅ Result
 
 After following these steps, you can run `claude` inside the container, and it will have full shell access and persistent project files.
-
