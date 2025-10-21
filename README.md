@@ -1,8 +1,8 @@
-# 🧠 Claude Code Docker Environment
+# Claude Code Docker Environment
 
 A lightweight, reproducible Docker setup for running **Claude Code CLI** inside a Node.js 24 Alpine container with full POSIX shell support.
 
-## 🚀 Overview
+## Overview
 
 This Docker configuration provides a minimal, isolated Node.js environment specifically designed for **Claude Code CLI**. It ensures Claude runs correctly inside a container with proper POSIX shell support, enabling AI-assisted development while keeping your host system clean and secure.
 
@@ -13,7 +13,7 @@ This Docker configuration provides a minimal, isolated Node.js environment speci
 - Mounts your local project directory for seamless file access
 - Provides an interactive shell session for development work
 
-## 🧩 Features
+## Features
 
 - **Lightweight**: Based on `node:24-alpine` for minimal resource usage
 - **POSIX Compliant**: Bash shell preinstalled for Claude CLI compatibility
@@ -23,7 +23,7 @@ This Docker configuration provides a minimal, isolated Node.js environment speci
 - **Isolated**: Development environment separate from host system
 - **Reproducible**: Consistent setup across different machines
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before using this Docker environment, ensure you have:
 
@@ -51,7 +51,7 @@ Edit `docker-compose.yml` and replace `Path/To/Directory` with your actual proje
 ```yaml
 volumes:
   # Replace with your local project directory
-  - /absolute/path/to/your/project:/workspace
+  - Path/To/Directory:/workspace
 ```
 
 **Examples:**
@@ -86,7 +86,7 @@ claude
 claude
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Docker Compose Options
 
@@ -124,7 +124,7 @@ The container mounts your local directory to `/workspace`:
 - **Access**: Read/write from both sides
 - **Persistence**: Files persist after container stops
 
-## 📖 Usage
+## Usage
 
 ### Basic Workflow
 
