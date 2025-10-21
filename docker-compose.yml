@@ -1,11 +1,13 @@
 services:
   claude:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # Option 1: Pull image from Dockerhub
+    image: skimming124/claude-code-docker
+    # Option 2: Build image from source
+    # build: .
     container_name: claude
     working_dir: /workspace
     volumes:
+      # Replace `Path/To/Directory` with directory you want Claude Code to access
       - Path/To/Directory:/workspace
     tty: true
     stdin_open: true
