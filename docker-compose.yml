@@ -7,8 +7,8 @@ services:
     container_name: claude
     working_dir: /workspace
     volumes:
-      # Replace `Path/To/Directory` with directory you want Claude Code to access
-      - Path/To/Directory:/workspace
+      # Replace `/absolute/path/to/your/projecty` with directory you want Claude Code to access
+      - /absolute/path/to/your/project:/workspace
     tty: true
     stdin_open: true
     environment:
