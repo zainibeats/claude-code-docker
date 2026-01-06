@@ -1,35 +1,25 @@
 # Claude Code Docker Environment
 
-A lightweight, reproducible Docker setup for running **Claude Code CLI** inside a Node.js 24 Alpine container with full POSIX shell support.
+A lightweight, reproducible Docker setup for running **Claude Code CLI** inside a Node.js 24 Alpine container with full POSIX shell support. While configured for Claude, this environment can be adapted to other AI tools (eg. Gemini CLI).
 
 ## Overview
 
-This Docker configuration provides a minimal, isolated Node.js environment specifically designed for **Claude Code CLI**. It ensures Claude runs correctly inside a container with proper POSIX shell support, enabling AI-assisted development while keeping your host system clean and secure.
+This Docker configuration provides a minimal, isolated Node.js environment specifically designed for **Claude Code CLI**. It ensures the AI agent runs correctly inside a container with proper POSIX shell support, enabling AI-assisted development while keeping your host system clean and secure.
 
 **What it does:**
 - Creates a lightweight Alpine Linux container with Node.js 24
-- Installs bash for POSIX shell compatibility (required by Claude CLI)
-- Automatically installs the latest `@anthropic-ai/claude-code` package
+- Installs essential development tools: **Git**, **Python 3**, **Docker CLI**, **curl**, and **wget** (openssh-client disabled by default)
+- Installs bash for POSIX shell compatibility
+- Automatically installs the latest `@anthropic-ai/claude-code` package (configurable)
 - Mounts your local project directory for seamless file access
 - Provides an interactive shell session for development work
-
-## Features
-
-- **Lightweight**: Based on `node:24-alpine` for minimal resource usage
-- **POSIX Compliant**: Bash shell preinstalled for Claude CLI compatibility
-- **Persistent Storage**: Local project directory mounted as `/workspace`
-- **Auto-Installation**: Claude Code CLI installed globally during build
-- **Interactive**: Full TTY support for seamless CLI interaction
-- **Isolated**: Development environment separate from host system
-- **Reproducible**: Consistent setup across different machines
 
 ## Prerequisites
 
 Before using this Docker environment, ensure you have:
 
-- **Docker**: [Install Docker Desktop](https://docs.docker.com/get-docker/) or Docker Engine
-- **Docker Compose**: Usually included with Docker Desktop
-- **Claude Account**: Access to [Claude Code CLI](https://claude.ai/code)
+- **Docker & Docker Compose**: [Install Docker Desktop](https://docs.docker.com/get-docker/) or Docker Engine
+- **AI Provider Account**: Access to [Claude Code CLI](https://claude.ai/code) or your preferred provider
 - **Git** (optional): For cloning repositories into the workspace
 
 ## 🚀 Quick Start
@@ -38,10 +28,9 @@ Before using this Docker environment, ensure you have:
 
 ```bash
 ## Clone this repository
+## Or download the files directly to your project directory
 git clone https://github.com/zainibeats/claude-code-docker
 cd claude-code-docker
-
-## Or download the files directly to your project directory
 ```
 
 ### 2. Configure Project Path
@@ -69,7 +58,8 @@ volumes:
 ```bash
 ## Build the Docker image
 docker compose build
-
+```
+```bash
 ## Start interactive session
 docker compose run claude
 ```
@@ -79,18 +69,31 @@ docker compose run claude
 Once inside the container:
 
 ```bash
-## Initialize Claude Code (first time only)
-claude
-
-## Subsequent uses
+## Initialize or use Claude Code
 claude
 ```
 
 ## Configuration
 
-### Docker Compose Options
+### Using Other AI Providers (e.g., Gemini CLI)
 
-The `docker-compose.yml` file supports two modes:
+This environment is designed to be provider-agnostic. You can easily replace Claude Code with any other CLI tool available on npm (like Gemini CLI).
+
+1. Open `Dockerfile`
+2. Locate the installation command:
+   ```dockerfile
+   RUN npm install -g @anthropic-ai/claude-code
+   ```
+3. Replace it with your preferred package:
+   ```dockerfile
+   ## Example: Installing Gemini CLI
+   RUN npm install -g @google/gemini-cli
+   ```
+> Optional: Change other instances of `claude` in Dockerfile to gemini 
+
+4. Rebuild the image: `docker compose build`
+
+### Docker Compose Options
 
 **Option 1: Use Pre-built Image (Recommended)**
 ```yaml
@@ -119,11 +122,6 @@ services:
 
 The container mounts your local directory to `/workspace`:
 
-- **Host**: Your local project directory
-- **Container**: `/workspace` (working directory)
-- **Access**: Read/write from both sides
-- **Persistence**: Files persist after container stops
-
 ## Usage
 
 ### Basic Workflow
@@ -135,7 +133,7 @@ docker compose build
 ## 2. Start container
 docker compose run claude
 
-## 3. Use Claude Code
+## 3. Use the CLI (claude, gemini, etc.)
 claude
 
 ## 4. Exit with Ctrl+D or 'exit'
@@ -156,6 +154,6 @@ docker start -ai claude
 ## Remove container
 docker rm claude
 
-##S Remove image
+## Remove image
 docker rmi skimming124/claude-code-docker
 ```
