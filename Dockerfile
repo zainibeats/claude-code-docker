@@ -27,7 +27,7 @@ RUN addgroup -g 1001 claude && \
 ## 5. Set working directory inside the container
 WORKDIR /workspace
 
-## 6. Install Claude Code CLI globally
+## 6. Install Claude Code CLI globally - Replace with desired cli agent
 RUN npm install -g @anthropic-ai/claude-code
 
 ## 7. Set ownership of workspace (if using non-root user)
