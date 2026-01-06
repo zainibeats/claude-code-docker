@@ -37,11 +37,11 @@ Before using this Docker environment, ensure you have:
 ### 1. Clone or Download
 
 ```bash
-# Clone this repository
+## Clone this repository
 git clone https://github.com/zainibeats/claude-code-docker
 cd claude-code-docker
 
-# Or download the files directly to your project directory
+## Or download the files directly to your project directory
 ```
 
 ### 2. Configure Project Path
@@ -50,27 +50,27 @@ Edit `docker-compose.yml` and replace `Path/To/Directory` with your actual proje
 
 ```yaml
 volumes:
-  # Replace with your local project directory
+  ## Replace with your local project directory
   - Path/To/Directory:/workspace
 ```
 
 **Examples:**
 ```yaml
-# For Linux/macOS
+## For Linux/macOS
 - /home/user/my-project:/workspace
 - /Users/john/documents/coding/my-app:/workspace
 
-# For Windows
+## For Windows
 - C:\Users\John\Projects\my-app:/workspace
 ```
 
 ### 3. Build and Run
 
 ```bash
-# Build the Docker image
+## Build the Docker image
 docker compose build
 
-# Start interactive session
+## Start interactive session
 docker compose run claude
 ```
 
@@ -79,10 +79,10 @@ docker compose run claude
 Once inside the container:
 
 ```bash
-# Initialize Claude Code (first time only)
+## Initialize Claude Code (first time only)
 claude
 
-# Subsequent uses
+## Subsequent uses
 claude
 ```
 
@@ -96,16 +96,16 @@ The `docker-compose.yml` file supports two modes:
 ```yaml
 services:
   claude:
-    image: skimming124/claude-code-docker  # Pull from registry
-    # ... rest of config
+    image: skimming124/claude-code-docker  ## Pull from registry
+    ## ... rest of config
 ```
 
 **Option 2: Build from Source**
 ```yaml
 services:
   claude:
-    build: .  # Build using local Dockerfile
-    # ... rest of config
+    build: .  ## Build using local Dockerfile
+    ## ... rest of config
 ```
 
 ### Environment Variables
@@ -129,33 +129,33 @@ The container mounts your local directory to `/workspace`:
 ### Basic Workflow
 
 ```bash
-# 1. Build the image (one time)
+## 1. Build the image (one time)
 docker compose build
 
-# 2. Start container
+## 2. Start container
 docker compose run claude
 
-# 3. Use Claude Code
+## 3. Use Claude Code
 claude
 
-# 4. Exit with Ctrl+D or 'exit'
+## 4. Exit with Ctrl+D or 'exit'
 ```
 
 ### Container Management
 
 ```bash
-# View running containers
+## View running containers
 docker ps
 
-# Stop container
+## Stop container
 docker stop claude
 
-# Restart container (preserves state)
+## Restart container (preserves state)
 docker start -ai claude
 
-# Remove container
+## Remove container
 docker rm claude
 
-# Remove image
+##S Remove image
 docker rmi skimming124/claude-code-docker
 ```
