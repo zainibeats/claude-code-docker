@@ -6,9 +6,12 @@ A lightweight, provider-agnostic Docker environment for running AI coding agents
 
 **What it does:**
 - Creates a minimal Alpine Linux container with Node.js 24
-- Installs essential dev tools: Git, Python 3, Docker CLI, curl, ripgrep
+- Installs practical coding-agent tools: Git, Python 3, pytest, Docker CLI + Compose, curl, ripgrep, jq, SSH client, editors, and common Unix utilities
 - Automatically matches the container user's UID/GID to your host user so bind-mounted files have correct ownership
 - Mounts your local project directory for seamless file access
+- Marks Git repositories as safe inside the container so bind-mounted workspaces do not trigger dubious ownership errors
+- Mounts the host Docker socket so agents can run Docker commands without running a nested Docker daemon
+- Enables Bubblewrap-based command sandboxes used by tools such as Codex
 - Provides an interactive shell session
 
 ## Prerequisites
@@ -106,6 +109,40 @@ To override UID/GID or username at runtime:
 ```bash
 UID=1001 GID=1001 AGENT_USER=myuser docker compose run contagent
 ```
+
+### Docker Access
+
+The Compose file mounts `/var/run/docker.sock` and sets `DOCKER_HOST=unix:///var/run/docker.sock`. This lets the agent run `docker` and `docker compose` commands against the host Docker daemon.
+
+This is usually a better default than Docker-in-Docker for an interactive coding-agent container: it avoids a privileged nested daemon, keeps image builds cached by the host, and works with the same containers/images you already use locally. Treat Docker socket access as privileged access to the host.
+
+### Codex Sandbox Support
+
+Codex may use Bubblewrap to sandbox shell commands. Without namespace support inside the container, commands can fail before they start with an error like:
+
+```text
+bwrap: No permissions to creating new namespace
+```
+
+The image installs `bubblewrap`, and the Compose service adds `SYS_ADMIN` plus relaxed seccomp/AppArmor settings so nested command sandboxes can start.
+
+On some Linux hosts, the host kernel must also allow unprivileged user namespaces:
+
+```bash
+sudo sysctl kernel.unprivileged_userns_clone=1
+```
+
+To make that persistent on Debian/Ubuntu hosts, add `kernel.unprivileged_userns_clone=1` under `/etc/sysctl.d/` and reload sysctl settings.
+
+### Git Safe Directory
+
+The entrypoint runs:
+
+```bash
+git config --global --replace-all safe.directory '*'
+```
+
+This avoids Git's `detected dubious ownership` error for bind-mounted repositories. The container is intended to operate on a workspace you explicitly mounted for the agent, so all repositories are marked safe inside the container.
 
 ### Project Structure
 

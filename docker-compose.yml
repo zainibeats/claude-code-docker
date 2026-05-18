@@ -10,9 +10,19 @@ services:
     volumes:
       ## Replace with the directory you want the agent to access
       - ${PATH_TO_WORKSPACE}:/workspace
+      ## Allow the agent to run Docker commands through the host Docker daemon
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HOST_UID=${UID:-1000}
       - HOST_GID=${GID:-${UID:-1000}}
       - AGENT_USER=${AGENT_USER:-agent}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    cap_add:
+      ## Allows Bubblewrap-based agent sandboxes, including Codex, to create namespaces
+      - SYS_ADMIN
+    security_opt:
+      ## Docker's default seccomp/AppArmor profiles can block nested sandbox setup
+      - seccomp=unconfined
+      - apparmor=unconfined
     tty: true
     stdin_open: true

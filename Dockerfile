@@ -2,16 +2,31 @@ FROM node:24-alpine
 
 RUN apk add --no-cache \
     bash \
-    git \
+    bubblewrap \
+    ca-certificates \
+    coreutils \
     curl \
-    python3 \
     docker-cli \
-    su-exec \
+    docker-cli-compose \
+    findutils \
+    git \
+    jq \
+    less \
+    make \
+    nano \
+    openssh-client \
+    procps \
+    py3-pip \
+    py3-pytest \
+    py3-pytest-cov \
+    python3 \
+    ripgrep \
     shadow \
-    ripgrep
-    ## Uncommend for Codex
-    # ripgrep \
-    # bubblewrap
+    su-exec \
+    vim
+
+## Optional: native build toolchain for Python/Node packages that compile extensions.
+# RUN apk add --no-cache build-base linux-headers
 
 ENV SHELL=/bin/bash \
     NODE_ENV=development \
