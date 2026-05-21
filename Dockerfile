@@ -13,7 +13,6 @@ RUN apk add --no-cache \
     jq \
     less \
     make \
-    nano \
     openssh-client \
     procps \
     py3-pip \
@@ -23,7 +22,8 @@ RUN apk add --no-cache \
     ripgrep \
     shadow \
     su-exec \
-    vim
+    vim \
+    ruff
 
 ## Optional: native build toolchain for Python/Node packages that compile extensions.
 # RUN apk add --no-cache build-base linux-headers
