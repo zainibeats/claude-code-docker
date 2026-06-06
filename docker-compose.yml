@@ -1,10 +1,6 @@
 services:
   contagent:
-    ## Option 1: Build image from source
     build: .
-    ## Option 2: Pull image from Dockerhub
-    ## Tag Options: "claude-4.7" or "codex-5.5"
-    # image: skimming124/contagent:claude-4.7
     container_name: contagent
     working_dir: /workspace
     volumes:

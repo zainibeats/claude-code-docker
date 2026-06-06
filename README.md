@@ -82,22 +82,6 @@ RUN npm install -g @anthropic-ai/claude-code
 docker compose build
 ```
 
-### Pre-built Images (Docker Hub)
-
-Pull a pre-built image instead of building from source by uncommenting the `image:` line in `docker-compose.yml`:
-
-```yaml
-services:
-  contagent:
-    image: skimming124/contagent:claude-4.7   ## Claude Code 4.7
-    # image: skimming124/contagent:codex-5.5  ## Codex 5.5
-```
-
-| Tag | Tool |
-|-----|------|
-| `claude-4.7` | Claude Code 4.7 |
-| `codex-5.5` | OpenAI Codex 5.5 |
-
 ### Environment Variables
 
 | Variable | Description | Default |
@@ -209,5 +193,5 @@ docker stop contagent
 docker rm contagent
 
 ## Remove image
-docker rmi skimming124/contagent
+docker compose down --rmi local
 ```
