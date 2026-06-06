@@ -30,6 +30,15 @@ chown "$AGENT_USER:$AGENT_USER" /workspace
 # Let agents work with bind-mounted repositories without Git ownership prompts.
 su-exec "$AGENT_USER" git config --global --replace-all safe.directory '*'
 
+# Configure a container-local Git identity when provided by the Compose env.
+if [ -n "${GIT_USER_NAME:-}" ]; then
+    su-exec "$AGENT_USER" git config --global --replace-all user.name "$GIT_USER_NAME"
+fi
+
+if [ -n "${GIT_USER_EMAIL:-}" ]; then
+    su-exec "$AGENT_USER" git config --global --replace-all user.email "$GIT_USER_EMAIL"
+fi
+
 # If the host Docker socket is mounted, grant the agent user access to its group.
 if [ -S /var/run/docker.sock ]; then
     DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)

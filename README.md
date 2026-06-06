@@ -8,6 +8,7 @@ A lightweight, provider-agnostic Docker environment for running AI coding agents
 - Creates a minimal Alpine Linux container with Node.js 24
 - Installs practical coding-agent tools: Git, Python 3, pytest, Docker CLI + Compose, curl, ripgrep, jq, SSH client, editors, and common Unix utilities
 - Automatically matches the container user's UID/GID to your host user so bind-mounted files have correct ownership
+- Creates a container-local Git identity from `.env` when `GIT_USER_NAME` and `GIT_USER_EMAIL` are set
 - Mounts your local project directory for seamless file access
 - Marks Git repositories as safe inside the container so bind-mounted workspaces do not trigger dubious ownership errors
 - Mounts the host Docker socket so agents can run Docker commands without running a nested Docker daemon
@@ -39,6 +40,8 @@ cp .env.example .env
 Edit `.env`:
 ```
 PATH_TO_WORKSPACE=/home/user/my-project
+GIT_USER_NAME=Your Name
+GIT_USER_EMAIL=you@example.com
 ```
 
 ### 3. Build and Run
@@ -103,6 +106,8 @@ services:
 | `HOST_UID` | UID for the container user | `1000` |
 | `HOST_GID` | GID for the container user | `1000` |
 | `AGENT_USER` | Container username | `agent` |
+| `GIT_USER_NAME` | Git `user.name` written to `/home/$AGENT_USER/.gitconfig` at container startup | *(empty)* |
+| `GIT_USER_EMAIL` | Git `user.email` written to `/home/$AGENT_USER/.gitconfig` at container startup | *(empty)* |
 
 To override UID/GID or username at runtime:
 
@@ -143,6 +148,24 @@ git config --global --replace-all safe.directory '*'
 ```
 
 This avoids Git's `detected dubious ownership` error for bind-mounted repositories. The container is intended to operate on a workspace you explicitly mounted for the agent, so all repositories are marked safe inside the container.
+
+### Git Identity
+
+Set your Git commit identity in `.env`:
+
+```env
+GIT_USER_NAME=Your Name
+GIT_USER_EMAIL=you@example.com
+```
+
+At container startup, the entrypoint writes these values to the agent user's global Git config:
+
+```bash
+git config --global --replace-all user.name "$GIT_USER_NAME"
+git config --global --replace-all user.email "$GIT_USER_EMAIL"
+```
+
+This creates `/home/$AGENT_USER/.gitconfig` inside the container without mounting your host `.gitconfig`.
 
 ### Project Structure
 

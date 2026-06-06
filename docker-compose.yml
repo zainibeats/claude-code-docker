@@ -16,6 +16,8 @@ services:
       - HOST_UID=${UID:-1000}
       - HOST_GID=${GID:-${UID:-1000}}
       - AGENT_USER=${AGENT_USER:-agent}
+      - GIT_USER_NAME=${GIT_USER_NAME:-}
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-}
       - DOCKER_HOST=unix:///var/run/docker.sock
     cap_add:
       ## Allows Bubblewrap-based agent sandboxes, including Codex, to create namespaces
