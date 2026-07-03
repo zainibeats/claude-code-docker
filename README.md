@@ -82,6 +82,14 @@ RUN npm install -g @anthropic-ai/claude-code
 docker compose build
 ```
 
+### Updating an Installed Agent
+
+Update a globally installed agent in the running container from the host:
+
+```bash
+docker compose exec --user root contagent npm install -g @openai/codex@latest
+```
+
 ### Environment Variables
 
 | Variable | Description | Default |
