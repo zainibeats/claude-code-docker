@@ -1,0 +1,17 @@
+## Opt-in overlay for agents that run their own nested sandbox (Codex uses
+## Bubblewrap). Creating namespaces inside the container needs SYS_ADMIN and
+## relaxed seccomp/AppArmor, which is a meaningful weakening of the container
+## boundary -- so it is not part of the default profile.
+##
+## Usage:
+##   docker compose -f docker-compose.yml -f docker-compose.codex.yml run --rm contagent
+##
+## The alternative, usually preferable inside an already-isolated container, is
+## to disable the agent's own sandbox and let the container be the boundary.
+services:
+  contagent:
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp=unconfined
+      - apparmor=unconfined

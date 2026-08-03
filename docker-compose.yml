@@ -1,26 +1,61 @@
 services:
   contagent:
-    build: .
-    container_name: contagent
-    working_dir: /workspace
+    build:
+      context: .
+      args:
+        ## Switch providers from .env instead of editing the Dockerfile.
+        AGENT_PACKAGES: ${AGENT_PACKAGES:-@anthropic-ai/claude-code}
+    image: contagent:local
+    ## The workspace is mounted at its host path so that paths inside the
+    ## container mean the same thing to the host Docker daemon. Without this,
+    ## `docker run -v $(pwd):/app` from inside the container silently mounts a
+    ## non-existent host directory.
+    working_dir: ${PATH_TO_WORKSPACE:?set PATH_TO_WORKSPACE in .env}
     volumes:
-      ## Replace with the directory you want the agent to access
-      - ${PATH_TO_WORKSPACE}:/workspace
+      ## Replace with the directory you want the agent to access, via .env
+      - ${PATH_TO_WORKSPACE:?set PATH_TO_WORKSPACE in .env}:${PATH_TO_WORKSPACE}
+      ## Agent credentials, settings, project history, and shell history live
+      ## here. Without this volume every session starts logged out.
+      - agent-home:/home/agent
       ## Allow the agent to run Docker commands through the host Docker daemon
       - /var/run/docker.sock:/var/run/docker.sock
+      ## SSH agent forwarding, so `git push` over SSH works without copying
+      ## private keys into the container. Falls back to /dev/null when the host
+      ## has no agent running; the entrypoint detects that and unsets the var.
+      ## On macOS use SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock in .env.
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
     environment:
-      - HOST_UID=${UID:-1000}
-      - HOST_GID=${GID:-${UID:-1000}}
+      - WORKSPACE=${PATH_TO_WORKSPACE}
+      ## Run `id -u` / `id -g` on the host and set these in .env. Note that $UID
+      ## is not exported by the shell, so it cannot be read here automatically.
+      - HOST_UID=${HOST_UID:-1000}
+      - HOST_GID=${HOST_GID:-1000}
       - AGENT_USER=${AGENT_USER:-agent}
+      - AGENT_SUDO=${AGENT_SUDO:-1}
       - GIT_USER_NAME=${GIT_USER_NAME:-}
       - GIT_USER_EMAIL=${GIT_USER_EMAIL:-}
       - DOCKER_HOST=unix:///var/run/docker.sock
-    cap_add:
-      ## Allows Bubblewrap-based agent sandboxes, including Codex, to create namespaces
-      - SYS_ADMIN
-    security_opt:
-      ## Docker's default seccomp/AppArmor profiles can block nested sandbox setup
-      - seccomp=unconfined
-      - apparmor=unconfined
+      - SSH_AUTH_SOCK=/ssh-agent
+      ## Terminal fidelity: without these, colours and timestamps differ from
+      ## the host terminal the container was launched from.
+      - TERM=${TERM:-xterm-256color}
+      - COLORTERM=${COLORTERM:-}
+      - TZ=${TZ:-UTC}
+      ## Provider credentials. `docker compose run` does not inherit host
+      ## environment, so anything the agent needs has to be listed explicitly.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN:-}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - GH_TOKEN=${GH_TOKEN:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    ## Reap orphaned processes from long-running agent sessions.
+    init: true
     tty: true
     stdin_open: true
+
+volumes:
+  agent-home:
