@@ -1,0 +1,5 @@
+## The build only needs these two files. Allowlist so .env, .git, and anything
+## else in the repo root stay out of the build context.
+*
+!entrypoint.sh
+!bashrc
