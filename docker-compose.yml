@@ -59,3 +59,18 @@ services:
 
 volumes:
   agent-home:
+
+networks:
+  ## Pin the bridge subnet instead of letting Docker pick one. Docker's default
+  ## pool starts at 172.17.0.0/16 and walks up through 172.31, which is inside
+  ## RFC1918 space that hotel, conference, and corporate WiFi hand out to
+  ## clients. When the container subnet overlaps the LAN, the container's own
+  ## address falls inside the LAN prefix, so the host's longest-prefix match
+  ## sends reply packets out the physical interface instead of back into the
+  ## bridge. Traffic leaves, nothing returns, and every connection times out --
+  ## which looks exactly like a captive portal or a blocked API endpoint.
+  ## Override DOCKER_SUBNET in .env if this range clashes with a network you use.
+  default:
+    ipam:
+      config:
+        - subnet: ${DOCKER_SUBNET:-10.213.7.0/24}

@@ -110,6 +110,29 @@ npm install -g @anthropic-ai/claude-code@latest
 | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, … | Provider credentials, forwarded if set | *(empty)* |
 | `GH_TOKEN` | Token for `gh`; also configures git credentials for HTTPS pushes | *(empty)* |
 | `SSH_AUTH_SOCK` | Host SSH agent socket to forward | host value |
+| `DOCKER_SUBNET` | Subnet for the container's bridge network | `10.213.7.0/24` |
+
+### Network Subnet
+
+The bridge subnet is pinned to `10.213.7.0/24` rather than left to Docker's automatic allocation. Docker's default pool starts at `172.17.0.0/16` and walks upward through `172.31`, and those ranges are routinely handed out to clients by hotel, conference, and corporate WiFi.
+
+When the two overlap, the container's own address falls inside the LAN prefix. The host then has two routes covering it — the bridge and the physical interface — and longest-prefix match picks the physical one, so replies to the container are sent out over WiFi instead of back into the bridge. Outbound packets leave normally and nothing ever comes back, so every connection hangs until it times out. The symptom is indistinguishable from a captive portal or a blocked API endpoint.
+
+To diagnose it, compare the host LAN against the container network:
+
+```bash
+ip -brief addr                                  # host interfaces
+docker network inspect contagent_default \
+  --format '{{json .IPAM.Config}}'              # container subnet
+ip route get 172.20.0.2                         # swap in the container's IP
+```
+
+If that last command names your WiFi interface instead of a `br-*` bridge, the subnets overlap. Set `DOCKER_SUBNET` in `.env` to a range that does not, then recreate the network:
+
+```bash
+docker compose down
+docker compose run --rm contagent
+```
 
 ### Persistence
 
